@@ -58,19 +58,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y sshpass
 
-      - name: Deploy to server
+      - name: Check environment variables
+        run: |
+          echo "USER_NAME=$USER_NAME"
+          echo "HOST=$HOST"
+          echo "PASSWORD=$PASSWORD"
+
+      - name: Deploy to localhost
         env:
           USER_NAME: ${{ secrets.USER_NAME }}
-          HOST: ${{ secrets.HOST }}
+          HOST: ${{ secrets.HOST }}  # This will now be 'localhost'
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
           echo "Starting deployment..."
-          # Debugging: Print environment variables (DO NOT use this in production)
-          echo "USER_NAME=$USER_NAME"
-          echo "HOST=$HOST"
-          
-          # Correct sshpass usage:
-          # Ensure that `sshpass` is passing the password to the `ssh` command with `-o` option for SSH
           sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USER_NAME@$HOST << 'EOF'
             cd /path/to/deployment/directory
             git pull origin main
