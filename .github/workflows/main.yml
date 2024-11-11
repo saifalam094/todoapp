@@ -31,11 +31,11 @@ jobs:
             ${{ runner.os }}-maven
 
       - name: Build with Maven
-        working-directory: ./todoapp  # Change this if pom.xml is in a different folder
+        working-directory: ./todoapp  # Change if pom.xml is in a different folder
         run: mvn clean install -DskipTests
 
       - name: Run Tests
-        working-directory: ./todoapp  # Change this if pom.xml is in a different folder
+        working-directory: ./todoapp  # Change if pom.xml is in a different folder
         run: mvn test
 
   deploy:
@@ -53,6 +53,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Add SSH private key to ssh-agent (Optional - if you use SSH keys)
+        if: secrets.SSH_PRIVATE_KEY != ''
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          eval "$(ssh-agent -s)"
+          ssh-add private_key
+
       - name: Deploy to server
         env:
           USER_NAME: ${{ secrets.USER_NAME }}
@@ -61,8 +69,9 @@ jobs:
         run: |
           echo "Starting deployment..."
           sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USER_NAME@$HOST" << 'EOF'
-            cd /path/to/deployment/directory
-            git pull origin main
-            mvn clean install
-            java -jar target/your-spring-boot-app.jar &
+            echo "Deploying to server..."
+            cd /path/to/deployment/directory || { echo 'Failed to cd'; exit 1; }
+            git pull origin main || { echo 'Git pull failed'; exit 1; }
+            mvn clean install || { echo 'Maven install failed'; exit 1; }
+            java -jar target/your-spring-boot-app.jar & || { echo 'Failed to start application'; exit 1; }
           EOF
