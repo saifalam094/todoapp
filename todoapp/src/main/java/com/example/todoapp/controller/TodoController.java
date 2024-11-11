@@ -17,6 +17,7 @@ public class TodoController {
 
     @GetMapping
     public List<Todo> getAllTodos() {
+        System.out.println("this is controller file ");
         return todoService.getAllTodos();
     }
 
