@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'  # Specify Java 17 distribution
+          distribution: 'temurin'
 
       - name: Cache Maven packages
         uses: actions/cache@v2
@@ -31,9 +31,11 @@ jobs:
             ${{ runner.os }}-maven
 
       - name: Build with Maven
+        working-directory: ./  # Specify the directory with the pom.xml file
         run: mvn clean install -DskipTests
 
       - name: Run Tests
+        working-directory: ./  # Specify the directory with the pom.xml file
         run: mvn test
 
   deploy:
@@ -49,7 +51,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'  # Ensure Java 17 for deployment as well
+          distribution: 'temurin'
 
       - name: Deploy to server
         env:
