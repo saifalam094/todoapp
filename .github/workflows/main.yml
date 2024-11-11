@@ -60,7 +60,7 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
           echo "Starting deployment..."
-          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USER_NAME@$HOST << 'EOF'
+          sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USER_NAME@$HOST" << 'EOF'
             cd /path/to/deployment/directory
             git pull origin main
             mvn clean install
